@@ -1,1 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Таймер обратного отсчета</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .timer {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .time-unit {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 140px;
+        }
+
+        .time-number {
+            font-size: 3rem;
+            font-weight: bold;
+            display: block;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .time-label {
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            display: block;
+            opacity: 0.9;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-top: 1rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .additional-text {
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            line-height: 1.5;
+        }
+
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 768px) {
+            .timer {
+                gap: 1rem;
+            }
+            
+            .time-unit {
+                min-width: 100px;
+                padding: 1rem;
+            }
+            
+            .time-number {
+                font-size: 2rem;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .additional-text {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">До технического дефолта:</h1>
+        <div class="timer" id="timer">
+            <div class="time-unit">
+                <span class="time-number" id="days">00</span>
+                <span class="time-label" id="days-label">дней</span>
+            </div>
+            <div class="time-unit">
+                <span class="time-number" id="hours">00</span>
+                <span class="time-label" id="hours-label">часов</span>
+            </div>
+            <div class="time-unit">
+                <span class="time-number" id="minutes">00</span>
+                <span class="time-label" id="minutes-label">минут</span>
+            </div>
+            <div class="time-unit">
+                <span class="time-number" id="seconds">00</span>
+                <span class="time-label" id="seconds-label">секунд</span>
+            </div>
+        </div>
+        <p class="additional-text" id="additionalText">Дополнительный текст здесь. Это может быть описание события, инструкция или любая другая информация.</p>
+    </div>
+
+    <script>
+        // НАСТРОЙКИ - ИЗМЕНИТЕ ЭТИ ЗНАЧЕНИЯ ПОД СВОИ НУЖДЫ
+        
+        // Целевая дата и время (формат: ГГГГ-ММ-ДДTЧЧ:мм:сс)
+        const targetDate = new Date('2025-11-20T12:00:00').getTime();
+        
+        // Основной текст под таймером
+        const subtitleText = 'До технического дефолта';
+        
+        // Дополнительный текст
+        const additionalText = 'Готовьтесь к моей депрессии с 20 ноября 2025';
+
+        // Устанавливаем тексты
+        document.getElementById('additionalText').textContent = additionalText;
+
+        // Функция для правильного склонения слов
+        function getTimeLabel(value, words) {
+            value = Math.abs(value) % 100;
+            const num = value % 10;
+            
+            if (value > 10 && value < 20) return words[2];
+            if (num > 1 && num < 5) return words[1];
+            if (num === 1) return words[0];
+            return words[2];
+        }
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const timeLeft = targetDate - now;
+            
+            if (timeLeft < 0) {
+                // Таймер завершен
+                document.getElementById('timer').innerHTML = '<div class="time-unit"><span class="time-number">00</span><span class="time-label">Время вышло!</span></div>';
+                document.getElementById('subtitle').textContent = 'Событие наступило!';
+                document.getElementById('additionalText').textContent = 'Поздравляем! Событие началось.';
+                return;
+            }
+            
+            // Расчет дней, часов, минут и секунд
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+            
+            // Обновление отображения
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            
+            // Обновляем подписи с правильным склонением
+            document.getElementById('days-label').textContent = getTimeLabel(days, ['день', 'дня', 'дней']);
+            document.getElementById('hours-label').textContent = getTimeLabel(hours, ['час', 'часа', 'часов']);
+            document.getElementById('minutes-label').textContent = getTimeLabel(minutes, ['минута', 'минуты', 'минут']);
+            document.getElementById('seconds-label').textContent = getTimeLabel(seconds, ['секунда', 'секунды', 'секунд']);
+        }
+
+        // Обновляем таймер сразу и затем каждую секунду
+        updateTimer();
+        setInterval(updateTimer, 1000);
+    </script>
+</body>
+</html>
